@@ -1,0 +1,13 @@
+---
+## Package
+eap_package: jboss-eap-7.3.0.zip
+artifact_name: hibernate.war
+jdbc_driver: mysql-connector-java-8.0.12.jar
+repoitory_url: "http://192.168.178.100:8080/sw"
+remote: true
+
+## Configure
+jdbc_db_url: "jdbc:mysql://192.168.178.100:3306/ansible"
+jdbc_db_username: "ansible"
+jdbc_db_password: "ansible"
+jdbc_db_jndi: "java:/Docker_MySQL"

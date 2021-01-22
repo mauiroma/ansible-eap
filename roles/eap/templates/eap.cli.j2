@@ -1,0 +1,6 @@
+if (outcome != success) of /subsystem=datasources/jdbc-driver=mysql:read-resource
+    /subsystem=datasources/jdbc-driver=mysql:add(driver-module-name=jdbc.mysql)
+end-if
+if (outcome != success) of /subsystem=datasources/data-source=DS:read-resource
+    /subsystem=datasources/data-source=DS:add(driver-name=mysql,min-pool-size=5,max-pool-size=50,jndi-name="{{jdbc_db_jndi}}",background-validation=true,connection-url="{{jdbc_db_url}}",enabled=true,pool-prefill=true,user-name={{jdbc_db_username}},password={{jdbc_db_password}},statistics-enabled=true,jta=true,check-valid-connection-sql="SELECT 1")
+end-if

@@ -1,0 +1,25 @@
+---
+
+- name: jboss-eap | Copy Service config
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.permissions }}"
+    owner: "{{ jboss_eap_user }}"
+    group: "{{ jboss_eap_group }}"
+  with_items:
+    - { src: "eap.conf.j2",
+        dest: "{{ jboss_eap_home_path }}/bin/init.d/eap.conf",
+        permissions: "0640" }
+    - { src: "eap.service.j2",
+        dest: "/etc/systemd/system/eap-{{ project }}.service",
+        permissions: "0640" }
+  #notify: restart jboss-eap
+
+
+- name: jboss-eap | Manage service
+  systemd:
+    name: eap-{{ project }}
+    state: "{{ jboss_eap_service_state }}"
+    enabled: "{{ jboss_eap_service_enabled }}"
+    daemon_reload: yes

@@ -1,0 +1,1 @@
+ansible-playbook eap-playbook.yml -i inventory.ini  -v

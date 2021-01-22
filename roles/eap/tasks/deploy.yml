@@ -1,0 +1,21 @@
+---
+
+- name: jboss-eap | Download Artifact
+  get_url:
+    url: "{{ repoitory_url }}/{{ artifact_name }}"
+    dest: "{{ jboss_eap_deploy_dir_path }}"
+    owner: "{{ jboss_eap_user }}"
+    group: "{{ jboss_eap_group }}"
+    mode: 0644
+    backup: no
+  when: remote
+
+- name: jboss-eap | Copy Artifact
+  copy:
+    src: "{{ artifact_name }}"
+    dest: "{{ jboss_eap_deploy_dir_path }}"
+    owner: "{{ jboss_eap_user }}"
+    group: "{{ jboss_eap_group }}"
+    mode: 0644
+    backup: no
+  when: not remote

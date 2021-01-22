@@ -1,0 +1,24 @@
+---
+
+- name: jboss-eap | Check installed version
+  command: >
+    {{jboss_eap_home_path}}/bin/jboss-cli.sh -c --commands=":read-attribute(name=product-version)"  
+  changed_when: false
+  ignore_errors: false
+  no_log: false
+
+
+- name: jboss-eap | Copy cli batch file
+  template:
+    src: "eap.cli.j2"
+    dest: "{{ jboss_eap_home_path }}/bin/eap.cli"
+    mode: "{{ 0640 }}"
+    owner: "{{ jboss_eap_user }}"
+    group: "{{ jboss_eap_group }}"
+
+- name: jboss-eap | Execute CLI
+  command: >
+    {{jboss_eap_home_path}}/bin/jboss-cli.sh -c --file="{{jboss_eap_home_path}}/bin/eap.cli"
+  changed_when: false
+  ignore_errors: false
+  no_log: false  

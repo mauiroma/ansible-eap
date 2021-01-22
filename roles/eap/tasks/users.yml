@@ -1,0 +1,11 @@
+---
+
+- name: jboss-eap | Create management users
+  shell: >
+    {{ jboss_eap_home_path }}/bin/add-user.sh -s {{ jboss_eap_management_user }} {{ jboss_eap_management_password }} &&
+    touch {{ jboss_eap_home_path }}/.mgmt-users.{{ jboss_eap_management_user }}.provisioned
+#  with_items: "{{ jboss_eap_management_users }}"
+  args:
+    creates: "{{ jboss_eap_home_path }}/.mgmt-users.{{ jboss_eap_management_user }}.provisioned"
+#  when: jboss_eap_management_users | length > 0
+  no_log: false

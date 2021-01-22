@@ -1,0 +1,98 @@
+---
+
+- name: jboss-eap | Ensure jboss-eap group exists
+  group:
+    name: "{{ jboss_eap_group }}"
+
+- name: jboss-eap | Ensure jboss-eap user exists
+  user:
+    name: "{{ jboss_eap_user }}"
+    group: "{{ jboss_eap_group }}"
+    shell: "{{ jboss_eap_user_shell }}"
+    createhome: yes
+    home: "{{ jboss_eap_user_home }}"
+    #uid: "{{ jboss_eap_user_uid }}"
+    state: present
+
+
+- name: jboss-eap | Check installed version
+  stat:
+    path: "{{jboss_eap_home_path}}"
+  register: jboss_eap_check
+  no_log: false
+
+- name: jboss-eap | Download jboss-eap binaries
+  get_url:
+    url: "{{ repoitory_url }}/{{ eap_package }}"
+    dest: "/tmp/{{ eap_package }}"
+  when:
+      - not jboss_eap_check.stat.exists
+      - remote
+      
+- name: jboss-eap | Copy jboss-eap binaries
+  copy:
+    src: "{{ eap_package }}"
+    dest: "/tmp/{{ eap_package }}"
+  when:
+      - not jboss_eap_check.stat.exists
+      - not remote
+      
+- name: jboss-eap | Extract jboss-eap in the install directory
+  unarchive:
+    copy: no
+    src: "/tmp/{{ eap_package }}"
+    dest: "{{ jboss_eap_install_path }}"
+    owner: "{{ jboss_eap_user }}"
+    group: "{{ jboss_eap_group }}"
+  when: |
+      not jboss_eap_check.stat.exists
+
+- name: jboss-eap | Create Symlink to jboss-eap
+  file:
+    src: "{{ jboss_eap_home_path }}"
+    dest: "{{ jboss_eap_install_path }}/jboss-eap"
+    state: link
+    owner: "{{ jboss_eap_user }}"
+    group: "{{ jboss_eap_group }}"
+    force: True
+  when: |
+      not jboss_eap_check.stat.exists
+
+
+- name: jboss-eap | Create jdbc module path
+  file:
+    path: "{{ jboss_eap_home_path }}/modules/jdbc/mysql/main"
+    state: directory
+    recurse: yes
+    owner: "{{ jboss_eap_user }}"
+    group: "{{ jboss_eap_group }}"
+    
+
+- name: jboss-eap | Copy jdbc module
+  template:
+    src: "module.xml.j2"
+    dest: "{{ jboss_eap_home_path }}/modules/jdbc/mysql/main/module.xml"
+    owner: "{{ jboss_eap_user }}"
+    group: "{{ jboss_eap_group }}"
+
+- name: jboss-eap | Download jdbc driver binaries
+  get_url:
+    url: "{{ repoitory_url }}/{{ jdbc_driver }}"
+    dest: "{{ jboss_eap_home_path }}/modules/jdbc/mysql/main"
+    owner: "{{ jboss_eap_user }}"
+    group: "{{ jboss_eap_group }}"
+  when:
+      - remote    
+
+- name: jboss-eap | Copy jdbc driver binaries
+  copy:
+    src: "{{ jdbc_driver }}"
+    dest: "{{ jboss_eap_home_path }}/modules/jdbc/mysql/main"
+  when:
+      - not remote    
+
+- name: jboss-eap | restart
+  systemd:
+    name: eap-{{ project }}
+    state: restarted
+  

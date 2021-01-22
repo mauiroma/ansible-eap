@@ -1,0 +1,29 @@
+---
+
+- name: jboss-eap | Install
+  include: install.yml
+  tags:
+    - install
+
+- name: jboss-eap | Service
+  include: service.yml
+  tags:
+    - service
+
+- name: jboss-eap | Users
+  include: users.yml
+  tags:
+    - users
+
+- name: jboss-eap | Configure
+  include: config.yml
+  tags:
+    - configure
+
+- name: jboss-eap | Deploy
+  include: deploy.yml
+  tags:
+    - deploy
+
+
+
